@@ -44,6 +44,7 @@ public class KeyboardControl : MonoBehaviour
             keyInstances[i].splat = Instantiate(splatter, GetPositionInKeyboard(i), Quaternion.identity);
             keyInstances[i].splat.randomColor = false;
             keyInstances[i].splat.splatColor = new Color32(keyInstances[i].splat.splatColor.r, keyInstances[i].splat.splatColor.g, keyInstances[i].splat.splatColor.b, 0);
+            keyInstances[i].splat.ApplyStyle();
         }
     }
 
@@ -86,6 +87,14 @@ public class KeyboardControl : MonoBehaviour
 
         if (Input.inputString[0] == text[txtIndex])
         {
+            if(index != -1)
+            {
+                if(keyInstances[index].blockLevel != 0)
+                {
+                    ChangeStain(index);
+                    return;
+                }
+            }
             inputText.text += text[txtIndex++];
             GameManager.instance.scores++;
             while (text[txtIndex] == ' ' || text[txtIndex] == '\n' || text[txtIndex] == '\t')
@@ -97,10 +106,25 @@ public class KeyboardControl : MonoBehaviour
         {
             if (index != -1)
             {
-                //Show stains
-                keyInstances[index].splat.splatColor = new Color32(keyInstances[index].splat.splatColor.r, keyInstances[index].splat.splatColor.g, keyInstances[index].splat.splatColor.b, 255);
+                ChangeStain(index);
             }
         }
         
+    }
+
+    void ChangeStain(int index)
+    {
+        if(keyInstances[index].blockLevel == 0)
+        {
+            keyInstances[index].blockLevel = 3;
+            keyInstances[index].splat.splatColor = new Color32(keyInstances[index].splat.splatColor.r, keyInstances[index].splat.splatColor.g, keyInstances[index].splat.splatColor.b, 255);
+            keyInstances[index].splat.ApplyStyle();
+        }
+        else
+        {
+            keyInstances[index].blockLevel--;
+            keyInstances[index].splat.splatColor = new Color32(keyInstances[index].splat.splatColor.r, keyInstances[index].splat.splatColor.g, keyInstances[index].splat.splatColor.b, System.Convert.ToByte(keyInstances[index].blockLevel / 3.0f * 255));
+            keyInstances[index].splat.ApplyStyle();
+        }
     }
 }
